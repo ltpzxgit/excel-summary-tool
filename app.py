@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from io import BytesIO
 
-st.title("Excel Summary Tool")
+st.title("Excel Summary Tools")
 
 uploaded_file = st.file_uploader("Upload Excel file", type=["xlsx"])
 
@@ -37,4 +37,5 @@ if uploaded_file:
             data=output.getvalue(),
             file_name="report.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
         )
