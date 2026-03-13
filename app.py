@@ -15,16 +15,14 @@ if uploaded_file:
 
     if st.button("Generate Report"):
 
-        # ------------------------
-        # Sheet 3 : Jira_LDSO
-        # ------------------------
-
+        # -----------------------------
+        # Sheet3 : Jira_LDSO (Raw data)
+        # -----------------------------
         jira_ldso = df.copy()
 
-        # ------------------------
-        # Sheet 2 : Mapping
-        # ------------------------
-
+        # -----------------------------
+        # Sheet2 : Mapping
+        # -----------------------------
         grouped = df.groupby("Service Name")["LDSO"].apply(list)
 
         rows = []
@@ -38,14 +36,14 @@ if uploaded_file:
         for r in rows:
             r.extend([""] * (max_len - len(r)))
 
-        columns = ["Service Name", "Total"] + [f"LDSO_{i}" for i in range(1, max_len-1)]
+        mapping = pd.DataFrame(rows)
 
-        mapping = pd.DataFrame(rows, columns=columns)
+        # ตั้งชื่อ column
+        mapping.columns = ["Service Name", "Total"] + [""]*(len(mapping.columns)-2)
 
-        # ------------------------
-        # Sheet 1 : Summary
-        # ------------------------
-
+        # -----------------------------
+        # Sheet1 : Summary
+        # -----------------------------
         summary = (
             df.groupby(["Type", "Rank", "Status"])
             .size()
@@ -53,10 +51,9 @@ if uploaded_file:
             .reset_index()
         )
 
-        # ------------------------
+        # -----------------------------
         # Export Excel
-        # ------------------------
-
+        # -----------------------------
         output = BytesIO()
 
         with pd.ExcelWriter(output, engine="openpyxl") as writer:
@@ -64,6 +61,8 @@ if uploaded_file:
             summary.to_excel(writer, sheet_name="Summary", index=False)
             mapping.to_excel(writer, sheet_name="Mapping", index=False)
             jira_ldso.to_excel(writer, sheet_name="Jira_LDSO", index=False)
+
+        st.success("Report generated")
 
         st.download_button(
             label="Download Report",
