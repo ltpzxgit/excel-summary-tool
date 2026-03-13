@@ -15,37 +15,25 @@ if uploaded_file:
 
     if st.button("Generate Report"):
 
-        # Sheet 1 : Summary
-        summary = (
-            df.groupby("Product")["LDSO"]
-            .agg(
-                Count="count",
-                LDSO_List=lambda x: ", ".join(x.astype(str))
-            )
-            .reset_index()
-        )
+        # Group data
+        grouped = df.groupby("Product")["LDSO"].apply(list)
 
-        # Sheet 2 : Detail (ข้อมูล original)
-        detail = df.copy()
+        rows = []
 
-        # Sheet 3 : LDSO Horizontal
-        horizontal_data = []
+        for product, ldso_list in grouped.items():
+            row = [product, len(ldso_list)] + ldso_list
+            rows.append(row)
 
-        for product, group in df.groupby("Product"):
-            row = [product] + list(group["LDSO"])
-            horizontal_data.append(row)
+        max_len = max(len(r) for r in rows)
 
-        max_len = max(len(r) for r in horizontal_data)
-
-        for r in horizontal_data:
+        for r in rows:
             r.extend([""] * (max_len - len(r)))
 
-        columns = ["Product"] + [f"LDSO_{i}" for i in range(1, max_len)]
+        columns = ["Product", "Count"] + [f"LDSO_{i}" for i in range(1, max_len-1)]
 
-        horizontal = pd.DataFrame(horizontal_data, columns=columns)
+        summary = pd.DataFrame(rows, columns=columns)
 
-        st.subheader("Summary")
-        st.dataframe(summary)
+        detail = df.copy()
 
         output = BytesIO()
 
@@ -53,7 +41,9 @@ if uploaded_file:
 
             summary.to_excel(writer, sheet_name="Summary", index=False)
             detail.to_excel(writer, sheet_name="Detail", index=False)
-            horizontal.to_excel(writer, sheet_name="LDSO_Horizontal", index=False)
+
+        st.subheader("Summary")
+        st.dataframe(summary)
 
         st.download_button(
             label="Download Excel Report",
