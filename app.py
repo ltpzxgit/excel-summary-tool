@@ -110,6 +110,6 @@ if uploaded_file:
         st.download_button(
             label="Download Report",
             data=final_output.getvalue(),
-            file_name="Jira_Report.xlsx",
+            file_name="service_mapping.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
