@@ -3,7 +3,7 @@ import pandas as pd
 from io import BytesIO
 from openpyxl import load_workbook
 
-st.title("Jira LDSO Report Generator")
+st.title("ITOSE Tool for Service Mapping")
 
 uploaded_file = st.file_uploader("Upload Jira Excel", type=["xlsx"])
 
